@@ -1,0 +1,48 @@
+# Development Dockerfile - Single stage with both frontend and backend
+FROM node:20-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Go
+RUN curl -L https://go.dev/dl/go1.25.1.linux-amd64.tar.gz | tar -C /usr/local -xzf -
+ENV PATH="/usr/local/go/bin:$PATH"
+
+# Install Air for Go hot reload
+RUN go install github.com/air-verse/air@latest
+ENV PATH="/root/go/bin:$PATH"
+
+# Enable corepack for pnpm
+RUN npm install -g corepack@latest && corepack use pnpm@latest
+RUN npm install -g concurrently
+
+WORKDIR /app
+
+# Install frontend dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+# Install backend dependencies
+COPY backend/go.mod backend/go.sum ./backend/
+WORKDIR /app/backend
+RUN go mod download
+WORKDIR /app
+
+# Copy all source code (will be overridden by volume in dev)
+COPY . .
+
+# Create tmp directory for Go builds
+RUN mkdir -p backend/tmp
+
+# Expose ports
+EXPOSE 5173 3909
+
+# Development command with both frontend and backend
+CMD ["concurrently", \
+     "--names", "FRONTEND,BACKEND", \
+     "--prefix-colors", "blue,green", \
+     "pnpm run dev:client", \
+     "cd backend && air -c .air.toml"]

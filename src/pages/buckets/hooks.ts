@@ -10,7 +10,18 @@ import { CreateBucketSchema } from "./schema";
 export const useBuckets = () => {
   return useQuery({
     queryKey: ["buckets"],
-    queryFn: () => api.get<GetBucketRes>("/buckets"),
+    queryFn: async () => {
+      try {
+        const response = await api.get<GetBucketRes>("/buckets");
+        // Handle the API response structure { data: [...], success: true }
+        return response?.data || [];
+      } catch (error) {
+        console.error("Failed to fetch buckets:", error);
+        // Return empty array on error to prevent UI crash
+        return [];
+      }
+    },
+    retry: 2,
   });
 };
 

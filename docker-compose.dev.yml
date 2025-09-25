@@ -1,0 +1,41 @@
+services:
+  # Garage - unchanged, uses official image
+  garage:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage-dev
+    volumes:
+      - ./garage.toml:/etc/garage.toml
+      - ./dev-data/garage/meta:/var/lib/garage/meta
+      - ./dev-data/garage/data:/var/lib/garage/data
+    ports:
+      - "3900:3900"  # S3 API
+      - "3901:3901"  # RPC
+      - "3902:3902"  # S3 Web
+      - "3903:3903"  # Admin API
+
+  # WebUI - Single service for development
+  webui:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: garage-webui-dev
+    ports:
+      - "5173:5173"  # Frontend dev server
+      - "3909:3909"  # Backend API
+    volumes:
+      - .:/app
+      - ./garage.toml:/etc/garage.toml:ro
+      - /app/node_modules
+      - /app/backend/tmp
+    environment:
+      - VITE_API_URL=http://127.0.0.1:3909
+      - CONFIG_PATH=/etc/garage.toml
+      - API_BASE_URL=http://garage:3903
+      - S3_ENDPOINT_URL=http://garage:3900
+      - DATA_DIR=/app/data
+      - CORS_ALLOWED_ORIGINS=http://localhost:5173
+      - RATE_LIMIT_REQUESTS=1000
+      - RATE_LIMIT_WINDOW=1m
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - garage

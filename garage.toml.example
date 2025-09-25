@@ -1,0 +1,58 @@
+# Garage Configuration Example for Development
+# Copy this file to garage.toml and modify as needed
+
+# Data storage locations
+metadata_dir = "/var/lib/garage/meta"
+data_dir = "/var/lib/garage/data"
+
+# Database engine (sqlite for development, lmdb for production)
+db_engine = "sqlite"
+
+# Automatic metadata snapshots (optional)
+metadata_auto_snapshot_interval = "6h"
+
+# Replication settings
+replication_factor = 1  # Use 3 for production clusters
+
+# Compression level (1-6, higher = better compression but slower)
+compression_level = 2
+
+# RPC Configuration
+rpc_bind_addr = "[::]:3901"
+rpc_public_addr = "127.0.0.1:3901"  # Change to your public IP for production
+rpc_secret = "1799bccfd7411abbccc9a3f8a0ccc314f5d0d9690e9a2cc4de5ba8faa24a3ee2"  # CHANGE THIS
+
+# S3 API Configuration
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "[::]:3900"
+root_domain = ".s3.garage.localhost"  # Change for production
+
+# S3 Web Interface (optional)
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = ".web.garage.localhost"  # Change for production
+index = "index.html"
+
+# Admin API Configuration (required for WebUI)
+[admin]
+api_bind_addr = "[::]:3903"
+admin_token = "dev-admin-token-change-for-production"  # CHANGE THIS
+metrics_token = "dev-metrics-token-change-for-production"  # CHANGE THIS
+
+# Examples of production configurations:
+
+# [s3_api]
+# s3_region = "us-east-1"
+# api_bind_addr = "[::]:3900"
+# root_domain = ".s3.yourdomain.com"
+
+# [s3_web]
+# bind_addr = "[::]:3902"
+# root_domain = ".web.yourdomain.com"
+# index = "index.html"
+
+# [admin]
+# api_bind_addr = "127.0.0.1:3903"  # Bind only to localhost for security
+# admin_token = "your-secure-admin-token-here"
+# metrics_token = "your-secure-metrics-token-here"

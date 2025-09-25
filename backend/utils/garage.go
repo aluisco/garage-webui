@@ -85,6 +85,27 @@ func (g *garage) GetS3Region() string {
 	return g.Config.S3API.S3Region
 }
 
+func (g *garage) GetWebEndpoint() string {
+	endpoint := os.Getenv("S3_WEB_ENDPOINT_URL")
+	if len(endpoint) > 0 {
+		return endpoint
+	}
+
+	if len(g.Config.S3Web.BindAddr) == 0 {
+		return ""
+	}
+
+	host := strings.Split(g.Config.RPCPublicAddr, ":")[0]
+	port := LastString(strings.Split(g.Config.S3Web.BindAddr, ":"))
+
+	endpoint = fmt.Sprintf("%s:%s", host, port)
+	if !strings.HasPrefix(endpoint, "http") {
+		endpoint = fmt.Sprintf("http://%s", endpoint)
+	}
+
+	return endpoint
+}
+
 func (g *garage) GetAdminKey() string {
 	key := os.Getenv("API_ADMIN_KEY")
 	if len(key) > 0 {

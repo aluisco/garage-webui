@@ -6,18 +6,19 @@ import {
   LayoutDashboard,
   LogOut,
   Palette,
+  Settings,
 } from "lucide-react";
 import { Dropdown, Menu } from "react-daisyui";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Button from "../ui/button";
 import { themes } from "@/app/themes";
 import appStore from "@/stores/app-store";
 import garageLogo from "@/assets/garage-logo.svg";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import * as utils from "@/lib/utils";
 import { toast } from "sonner";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, usePermissions } from "@/hooks/useAuth";
 
 const pages = [
   { icon: LayoutDashboard, title: "Dashboard", path: "/", exact: true },
@@ -29,6 +30,9 @@ const pages = [
 const Sidebar = () => {
   const { pathname } = useLocation();
   const auth = useAuth();
+  const { hasAnyPermission } = usePermissions();
+
+  const showAdminLink = hasAnyPermission(["system_admin", "read_users", "read_tenants"]);
 
   return (
     <aside className="bg-base-100 border-r border-base-300/30 w-[80%] md:w-[250px] flex flex-col items-stretch overflow-hidden h-full">
@@ -39,6 +43,18 @@ const Sidebar = () => {
           className="w-full max-w-[100px] mx-auto"
         />
         <p className="text-sm font-medium text-center">WebUI</p>
+
+        {/* User info */}
+        {auth.user && (
+          <div className="mt-2 p-2 bg-base-200 rounded-lg">
+            <p className="text-xs text-center text-base-content/60">
+              {auth.user.username}
+            </p>
+            <p className="text-xs text-center text-base-content/40">
+              {auth.user.role}
+            </p>
+          </div>
+        )}
       </div>
 
       <Menu className="gap-y-1 flex-1 overflow-y-auto">
@@ -62,6 +78,23 @@ const Sidebar = () => {
             </Menu.Item>
           );
         })}
+
+        {/* Admin link */}
+        {showAdminLink && (
+          <Menu.Item>
+            <Link
+              to="/admin"
+              className={cn(
+                "h-12 flex items-center px-6",
+                pathname.startsWith("/admin") &&
+                  "bg-primary text-primary-content hover:bg-primary/60 focus:bg-primary focus:text-primary-content"
+              )}
+            >
+              <Settings size={18} />
+              <p>Administración</p>
+            </Link>
+          </Menu.Item>
+        )}
       </Menu>
 
       <div className="py-2 px-4 flex items-center gap-2">
@@ -91,10 +124,16 @@ const Sidebar = () => {
 };
 
 const LogoutButton = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const logout = useMutation({
     mutationFn: () => api.post("/auth/logout"),
     onSuccess: () => {
-      window.location.href = utils.url("/auth/login");
+      // Clear auth queries
+      queryClient.removeQueries({ queryKey: ["auth"] });
+      // Navigate to login page
+      navigate("/auth/login", { replace: true });
     },
     onError: (err) => {
       toast.error(err?.message || "Unknown error");

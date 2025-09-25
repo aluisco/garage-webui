@@ -16,8 +16,18 @@ export const useBrowseObjects = (
 ) => {
   return useQuery({
     queryKey: ["browse", bucket, options],
-    queryFn: () =>
-      api.get<GetObjectsResult>(`/browse/${bucket}`, { params: options }),
+    queryFn: async () => {
+      try {
+        const response = await api.get<GetObjectsResult>(`/browse/${bucket}`, { params: options });
+        // Handle the API response structure { data: {...}, success: true }
+        return response?.data || { objects: [], prefixes: [] };
+      } catch (error) {
+        console.error("Failed to browse objects:", error);
+        // Return empty structure on error to prevent UI crash
+        return { objects: [], prefixes: [] };
+      }
+    },
+    retry: 2,
   });
 };
 

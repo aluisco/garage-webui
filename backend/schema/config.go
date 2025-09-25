@@ -26,3 +26,33 @@ type S3Web struct {
 	Index      string `json:"index" toml:"index"`
 	RootDomain string `json:"root_domain" toml:"root_domain"`
 }
+
+// S3Configuration represents the S3 configuration that can be modified at runtime
+type S3Configuration struct {
+	Region           string `json:"region"`
+	Endpoint         string `json:"endpoint"`
+	AdminAPI         string `json:"admin_api"`
+	WebEndpoint      string `json:"web_endpoint"`
+	MaxBuckets       int    `json:"max_buckets"`
+	MaxKeys          int    `json:"max_keys"`
+	DefaultQuota     int64  `json:"default_quota"`
+	AllowBucketCRUD  bool   `json:"allow_bucket_crud"`
+	AllowKeysCRUD    bool   `json:"allow_keys_crud"`
+	RequireAuth      bool   `json:"require_auth"`
+}
+
+// GetDefaultS3Config returns default S3 configuration
+func GetDefaultS3Config() *S3Configuration {
+	return &S3Configuration{
+		Region:           "garage",
+		Endpoint:         "http://localhost:3900",
+		AdminAPI:         "http://localhost:3903",
+		WebEndpoint:      "",
+		MaxBuckets:       10,
+		MaxKeys:          100,
+		DefaultQuota:     0, // No limit
+		AllowBucketCRUD:  true,
+		AllowKeysCRUD:    true,
+		RequireAuth:      true,
+	}
+}

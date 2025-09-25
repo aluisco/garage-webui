@@ -7,17 +7,21 @@ import (
 )
 
 func AuthMiddleware(next http.Handler) http.Handler {
-	authData := utils.GetEnv("AUTH_USER_PASS", "")
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth := utils.Session.Get(r, "authenticated")
+		userID := utils.Session.Get(r, "user_id")
 
-		if authData == "" {
-			next.ServeHTTP(w, r)
+		// Check if user is authenticated
+		if auth == nil || !auth.(bool) || userID == nil {
+			utils.ResponseErrorStatus(w, errors.New("unauthorized"), http.StatusUnauthorized)
 			return
 		}
 
-		if auth == nil || !auth.(bool) {
+		// Verify user still exists and is enabled
+		user, err := utils.DB.GetUser(userID.(string))
+		if err != nil || !user.Enabled {
+			// Clear invalid session
+			utils.Session.Clear(r)
 			utils.ResponseErrorStatus(w, errors.New("unauthorized"), http.StatusUnauthorized)
 			return
 		}

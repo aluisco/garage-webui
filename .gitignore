@@ -23,10 +23,56 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment files
 .env*
 !.env.example
-docker-compose.*.yml
+!.env.development
 
+# Docker compose development files (keep only production)
+# docker-compose.*.yml  # Commented out to allow dev files
+
+# Development data
 data/
 meta/
+dev-data/
 garage.toml
+
+# Backend specific
+backend/main
+backend/tmp/
+backend/data/
+backend/*.log
+backend/.air_tmp
+backend/build-errors.log
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+tmp/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+
+# Development certificates
+*.pem
+*.crt
+*.key
+
+# Cache and runtime
+.cache/
+.vite/
+runtime/
+logs/
+.claude/

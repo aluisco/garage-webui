@@ -5,11 +5,21 @@
   "type": "module",
   "scripts": {
     "dev:client": "vite",
+    "dev:client:host": "vite --host",
     "build": "tsc -b && vite build",
+    "build:dev": "tsc -b && vite build --mode development",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "dev:server": "cd backend && air",
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:docker": "docker-compose -f docker-compose.dev.yml up --build",
+    "dev:docker:clean": "docker-compose -f docker-compose.dev.yml down -v && docker system prune -f",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules/.vite",
+    "install:backend": "cd backend && go mod download",
+    "build:backend": "cd backend && go build -o main .",
+    "test:backend": "cd backend && go test ./..."
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
