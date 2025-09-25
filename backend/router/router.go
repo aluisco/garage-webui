@@ -51,6 +51,23 @@ func HandleApiRouter() *http.ServeMux {
 	router.HandleFunc("POST /s3/test", s3config.TestConnection)
 	router.HandleFunc("GET /s3/status", s3config.GetStatus)
 
+	// S3 Permissions routes
+	s3permissions := &S3Permissions{}
+	router.HandleFunc("GET /s3/policies/presets", s3permissions.GetPresetPolicies)
+	router.HandleFunc("POST /s3/policies/validate", s3permissions.ValidateS3Policy)
+	router.HandleFunc("GET /buckets/{bucketId}/keys/{accessKeyId}/permissions", s3permissions.GetKeyPermissions)
+	router.HandleFunc("PUT /buckets/{bucketId}/keys/{accessKeyId}/permissions", s3permissions.UpdateKeyPermissions)
+
+	// Object Locking routes
+	objectlocking := &ObjectLocking{}
+	router.HandleFunc("GET /buckets/{bucketId}/object-lock", objectlocking.GetBucketObjectLockConfiguration)
+	router.HandleFunc("PUT /buckets/{bucketId}/object-lock", objectlocking.PutBucketObjectLockConfiguration)
+	router.HandleFunc("GET /buckets/{bucketId}/objects", objectlocking.ListObjectsWithLocking)
+	router.HandleFunc("GET /buckets/{bucketId}/objects/{objectKey}/retention", objectlocking.GetObjectRetention)
+	router.HandleFunc("PUT /buckets/{bucketId}/objects/{objectKey}/retention", objectlocking.PutObjectRetention)
+	router.HandleFunc("GET /buckets/{bucketId}/objects/{objectKey}/legal-hold", objectlocking.GetObjectLegalHold)
+	router.HandleFunc("PUT /buckets/{bucketId}/objects/{objectKey}/legal-hold", objectlocking.PutObjectLegalHold)
+
 	// Proxy request to garage api endpoint
 	router.HandleFunc("/", ProxyHandler)
 
