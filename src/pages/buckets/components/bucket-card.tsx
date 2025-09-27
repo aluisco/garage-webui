@@ -14,9 +14,16 @@ const BucketCard = ({ data }: Props) => {
         <div className="flex flex-row items-start gap-x-3 col-span-2">
           <ArchiveIcon size={28} className="shrink-0" />
 
-          <p className="text-xl font-medium truncate">
-            {data.aliases?.join(", ")}
-          </p>
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-row items-center gap-2">
+              <p className="text-xl font-medium truncate">
+                {data.aliases?.join(", ")}
+              </p>
+              {data.websiteAccess && (
+                <div className="badge badge-sm badge-primary">Website</div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div>
