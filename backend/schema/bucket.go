@@ -22,6 +22,9 @@ type Bucket struct {
 	UnfinishedMultipartUploadBytes int64                    `json:"unfinishedMultipartUploadBytes"`
 	Quotas                         Quotas                   `json:"quotas"`
 	ObjectLockConfiguration        *ObjectLockConfiguration `json:"objectLockConfiguration,omitempty"`
+	// User and tenant assignments for bucket access control
+	AssignedUserID                 *string                  `json:"assignedUserId,omitempty"`
+	AssignedTenantID               *string                  `json:"assignedTenantId,omitempty"`
 	Created                        string                   `json:"created"`
 }
 
