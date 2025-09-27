@@ -30,7 +30,11 @@ const BucketsPage = () => {
       );
     }
 
-    buckets = buckets.sort((a, b) => a.aliases[0].localeCompare(b.aliases[0]));
+    buckets = buckets.sort((a, b) => {
+      const aliasA = (a.aliases && a.aliases.length > 0) ? a.aliases[0] : a.id;
+      const aliasB = (b.aliases && b.aliases.length > 0) ? b.aliases[0] : b.id;
+      return aliasA.localeCompare(aliasB);
+    });
 
     return buckets;
   }, [data, search]);
