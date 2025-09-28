@@ -56,7 +56,7 @@ export default function BucketAssignmentManager({
   };
 
   const handleUnassign = async () => {
-    if (window.confirm("¿Estás seguro de que quieres remover la asignación de este bucket?")) {
+    if (window.confirm("Are you sure you want to remove the assignment for this bucket?")) {
       try {
         await unassignBucket.mutateAsync(bucketId);
         onClose();
@@ -93,7 +93,7 @@ export default function BucketAssignmentManager({
       <Modal.Body className="space-y-6">
         {/* Current Assignment Status */}
         <Card className="bg-base-100 p-4">
-          <h4 className="font-semibold mb-3">Estado Actual</h4>
+          <h4 className="font-semibold mb-3">Current Status</h4>
           {isAssigned ? (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -101,14 +101,14 @@ export default function BucketAssignmentManager({
                   {assignment?.assigned_user && (
                     <>
                       <UserPlus size={16} />
-                      <span>Asignado a Usuario:</span>
+                      <span>Assigned to User:</span>
                       <Badge color="primary">{assignment.assigned_user.username}</Badge>
                     </>
                   )}
                   {assignment?.assigned_tenant && (
                     <>
                       <Building2 size={16} />
-                      <span>Asignado a Tenant:</span>
+                      <span>Assigned to Tenant:</span>
                       <Badge color="info">{assignment.assigned_tenant.name}</Badge>
                     </>
                   )}
@@ -128,7 +128,7 @@ export default function BucketAssignmentManager({
               <Alert status="success" className="text-sm">
                 <CheckCircle size={16} />
                 <div>
-                  Este bucket está asignado y puede ser gestionado por el usuario/tenant especificado.
+                  This bucket is assigned and can be managed by the specified user/tenant.
                 </div>
               </Alert>
             </div>
@@ -136,7 +136,7 @@ export default function BucketAssignmentManager({
             <Alert status="info" className="text-sm">
               <AlertCircle size={16} />
               <div>
-                Este bucket no está asignado a ningún usuario o tenant.
+                This bucket is not assigned to any user or tenant.
               </div>
             </Alert>
           )}
@@ -145,14 +145,14 @@ export default function BucketAssignmentManager({
         {/* Assignment Form */}
         <Card className="bg-base-100 p-4">
           <h4 className="font-semibold mb-3">
-            {isAssigned ? "Cambiar Asignación" : "Nueva Asignación"}
+            {isAssigned ? "Change Assignment" : "New Assignment"}
           </h4>
 
           <div className="space-y-4">
             {/* Assignment Type Selection */}
             <div>
               <label className="label">
-                <span className="label-text">Tipo de Asignación</span>
+                <span className="label-text">Assignment Type</span>
               </label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -165,7 +165,7 @@ export default function BucketAssignmentManager({
                     className="radio radio-primary"
                   />
                   <UserPlus size={16} />
-                  <span>Usuario</span>
+                  <span>User</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -186,14 +186,14 @@ export default function BucketAssignmentManager({
             {assignmentType === "user" && (
               <div>
                 <label className="label">
-                  <span className="label-text">Seleccionar Usuario</span>
+                  <span className="label-text">Select User</span>
                 </label>
                 <Select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
                   className="w-full"
                 >
-                  <option value="">Seleccionar usuario...</option>
+                  <option value="">Select user...</option>
                   {users?.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.username} ({user.email}) - {user.role}
@@ -207,14 +207,14 @@ export default function BucketAssignmentManager({
             {assignmentType === "tenant" && (
               <div>
                 <label className="label">
-                  <span className="label-text">Seleccionar Tenant</span>
+                  <span className="label-text">Select Tenant</span>
                 </label>
                 <Select
                   value={selectedTenantId}
                   onChange={(e) => setSelectedTenantId(e.target.value)}
                   className="w-full"
                 >
-                  <option value="">Seleccionar tenant...</option>
+                  <option value="">Select tenant...</option>
                   {tenants?.map((tenant) => (
                     <option key={tenant.id} value={tenant.id}>
                       {tenant.name} - {tenant.description}
@@ -229,10 +229,10 @@ export default function BucketAssignmentManager({
               <div className="bg-base-200 p-3 rounded text-sm">
                 <p className="font-medium mb-1">¿Qué significa asignar un bucket?</p>
                 <ul className="list-disc list-inside space-y-1 text-xs">
-                  <li>El usuario/tenant asignado puede gestionar las llaves de acceso del bucket</li>
+                  <li>The assigned user/tenant can manage the bucket's access keys</li>
                   <li>Puede modificar permisos y configuraciones específicas del bucket</li>
                   <li>Los administradores siempre mantienen acceso completo</li>
-                  <li>Solo se puede asignar a un usuario O tenant, no ambos</li>
+                  <li>Can only be assigned to one user OR tenant, not both</li>
                 </ul>
               </div>
             )}
@@ -255,7 +255,7 @@ export default function BucketAssignmentManager({
             }
             color="primary"
           >
-            {isAssigned ? "Cambiar Asignación" : "Asignar Bucket"}
+            {isAssigned ? "Change Assignment" : "Assign Bucket"}
           </Button>
         )}
       </Modal.Actions>

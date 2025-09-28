@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { useTenants, useDeleteTenant } from "@/hooks/useAdmin";
 import { usePermissions } from "@/hooks/useAuth";
-import { Card, Table, Button, Badge, Modal } from "react-daisyui";
-import { Plus, Edit, Trash2, Eye, Building, Building2 } from "lucide-react";
+import { Card, Table, Button, Badge } from "react-daisyui";
+import { Plus, Edit, Trash2, Eye, Building2 } from "lucide-react";
 import CreateTenantDialog from "../components/create-tenant-dialog";
 import EditTenantDialog from "../components/edit-tenant-dialog";
+import ViewTenantDialog from "../components/view-tenant-dialog";
 import { Tenant } from "@/types/admin";
 import dayjs from "dayjs";
+import { confirmDelete } from "@/lib/sweetalert";
 
 export default function TenantsTab() {
   const { hasPermission } = usePermissions();
@@ -16,22 +18,26 @@ export default function TenantsTab() {
   const [selectedTenant, setSelectedTenant] = useState<Tenant | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showViewDialog, setShowViewDialog] = useState(false);
 
-  const handleDelete = async () => {
-    if (!selectedTenant) return;
+  const handleDelete = async (tenant: Tenant) => {
+    const result = await confirmDelete(
+      tenant.name,
+      'tenant',
+      'This action cannot be undone and all associated users will lose access to the tenant.'
+    );
 
-    try {
-      await deleteTenant.mutateAsync(selectedTenant.id);
-      setShowDeleteConfirm(false);
-      setSelectedTenant(null);
-    } catch (error) {
-      // Error is handled by the mutation
+    if (result.isConfirmed) {
+      try {
+        await deleteTenant.mutateAsync(tenant.id);
+      } catch (error) {
+        // Error is handled by the mutation
+      }
     }
   };
 
   const formatBytes = (bytes: number | null | undefined) => {
-    if (!bytes) return "Sin límite";
+    if (!bytes) return "No limit";
 
     const units = ["B", "KB", "MB", "GB", "TB"];
     let value = bytes;
@@ -56,9 +62,9 @@ export default function TenantsTab() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold">Gestión de Tenants</h2>
+          <h2 className="text-xl font-semibold">Tenant Management</h2>
           <p className="text-sm text-base-content/60">
-            Administra tenants y sus configuraciones
+            Manage tenants and their configurations
           </p>
         </div>
 
@@ -68,7 +74,7 @@ export default function TenantsTab() {
             startIcon={<Plus size={18} />}
             onClick={() => setShowCreateDialog(true)}
           >
-            Nuevo Tenant
+            New Tenant
           </Button>
         )}
       </div>
@@ -79,12 +85,12 @@ export default function TenantsTab() {
           <Table className="table-zebra">
             <Table.Head>
               <span>Tenant</span>
-              <span>Descripción</span>
-              <span>Estado</span>
-              <span>Límites</span>
-              <span>Cuota</span>
-              <span>Creado</span>
-              <span>Acciones</span>
+              <span>Description</span>
+              <span>Status</span>
+              <span>Limits</span>
+              <span>Quota</span>
+              <span>Created</span>
+              <span>Actions</span>
             </Table.Head>
 
             <Table.Body>
@@ -106,13 +112,13 @@ export default function TenantsTab() {
 
                   <td>
                     <div className="max-w-xs truncate">
-                      {tenant.description || "Sin descripción"}
+                      {tenant.description || "No description"}
                     </div>
                   </td>
 
                   <td>
                     <Badge className={tenant.enabled ? "badge-success" : "badge-error"}>
-                      {tenant.enabled ? "Activo" : "Inactivo"}
+                      {tenant.enabled ? "Active" : "Inactive"}
                     </Badge>
                   </td>
 
@@ -141,7 +147,10 @@ export default function TenantsTab() {
                         size="sm"
                         color="ghost"
                         shape="square"
-                        onClick={() => setSelectedTenant(tenant)}
+                        onClick={() => {
+                          setSelectedTenant(tenant);
+                          setShowViewDialog(true);
+                        }}
                       >
                         <Eye size={16} />
                       </Button>
@@ -165,10 +174,7 @@ export default function TenantsTab() {
                           size="sm"
                           color="ghost"
                           shape="square"
-                          onClick={() => {
-                            setSelectedTenant(tenant);
-                            setShowDeleteConfirm(true);
-                          }}
+                          onClick={() => handleDelete(tenant)}
                         >
                           <Trash2 size={16} />
                         </Button>
@@ -182,7 +188,7 @@ export default function TenantsTab() {
 
           {tenants?.length === 0 && (
             <div className="text-center py-8 text-base-content/60">
-              No hay tenants registrados
+              No tenants registered
             </div>
           )}
         </Card.Body>
@@ -203,36 +209,15 @@ export default function TenantsTab() {
         }}
       />
 
-      {/* Delete Confirmation */}
-      <Modal open={showDeleteConfirm} onClickBackdrop={() => setShowDeleteConfirm(false)}>
-        <Modal.Header className="font-bold">
-          Confirmar Eliminación
-        </Modal.Header>
+      <ViewTenantDialog
+        open={showViewDialog}
+        tenant={selectedTenant}
+        onClose={() => {
+          setShowViewDialog(false);
+          setSelectedTenant(null);
+        }}
+      />
 
-        <Modal.Body>
-          <p>
-            ¿Estás seguro de que deseas eliminar el tenant{" "}
-            <strong>{selectedTenant?.name}</strong>?
-          </p>
-          <p className="text-sm text-base-content/60 mt-2">
-            Esta acción no se puede deshacer y todos los usuarios asociados
-            perderán el acceso al tenant.
-          </p>
-        </Modal.Body>
-
-        <Modal.Actions>
-          <Button onClick={() => setShowDeleteConfirm(false)}>
-            Cancelar
-          </Button>
-          <Button
-            color="error"
-            loading={deleteTenant.isPending}
-            onClick={handleDelete}
-          >
-            Eliminar
-          </Button>
-        </Modal.Actions>
-      </Modal>
     </div>
   );
 }

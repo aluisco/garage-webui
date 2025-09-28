@@ -9,9 +9,9 @@ import { Role } from "@/types/admin";
 import { Toggle } from "@/components/ui/toggle";
 
 const createUserSchema = z.object({
-  username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["admin", "tenant_admin", "user", "readonly"] as const),
   tenant_id: z.string().optional(),
   enabled: z.boolean(),
@@ -57,16 +57,16 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
   };
 
   const roleOptions = [
-    ...(isAdmin ? [{ value: "admin", label: "Administrador" }] : []),
-    { value: "tenant_admin", label: "Administrador de Tenant" },
-    { value: "user", label: "Usuario" },
-    { value: "readonly", label: "Solo Lectura" },
+    ...(isAdmin ? [{ value: "admin", label: "Administrator" }] : []),
+    { value: "tenant_admin", label: "Tenant Administrator" },
+    { value: "user", label: "User" },
+    { value: "readonly", label: "Read Only" },
   ];
 
   return (
     <Modal open={open} onClickBackdrop={onClose}>
       <Modal.Header className="font-bold">
-        Crear Nuevo Usuario
+        Create New User
       </Modal.Header>
 
       <Modal.Body>
@@ -74,8 +74,8 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
           <InputField
             form={form}
             name="username"
-            title="Nombre de Usuario"
-            placeholder="Ingresa el nombre de usuario"
+            title="Username"
+            placeholder="Enter username"
             required
           />
 
@@ -84,22 +84,22 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
             name="email"
             title="Email"
             type="email"
-            placeholder="Ingresa el email"
+            placeholder="Enter email"
             required
           />
 
           <InputField
             form={form}
             name="password"
-            title="Contraseña"
+            title="Password"
             type="password"
-            placeholder="Ingresa la contraseña"
+            placeholder="Enter password"
             required
           />
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Rol</span>
+              <span className="label-text">Role</span>
             </label>
             <Select
               {...form.register("role")}
@@ -130,7 +130,7 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
                 {...form.register("tenant_id")}
                 className="select-bordered"
               >
-                <Select.Option value="">Seleccionar tenant (opcional)</Select.Option>
+                <Select.Option value="">Select tenant (optional)</Select.Option>
                 {tenants?.map((tenant) => (
                   <Select.Option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -146,7 +146,7 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
                 {...form.register("enabled")}
                 color="success"
               />
-              <span className="label-text">Usuario habilitado</span>
+              <span className="label-text">User enabled</span>
             </label>
           </div>
         </form>
@@ -154,14 +154,14 @@ export default function CreateUserDialog({ open, onClose }: CreateUserDialogProp
 
       <Modal.Actions>
         <Button onClick={onClose} disabled={createUser.isPending}>
-          Cancelar
+          Cancel
         </Button>
         <Button
           color="primary"
           loading={createUser.isPending}
           onClick={form.handleSubmit(handleSubmit)}
         >
-          Crear Usuario
+          Create User
         </Button>
       </Modal.Actions>
     </Modal>

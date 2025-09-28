@@ -1,18 +1,15 @@
 import { useDenyKey } from "../hooks";
 import { Card, Checkbox, Table } from "react-daisyui";
 import Button from "@/components/ui/button";
-import { Trash, Shield } from "lucide-react";
+import { Trash } from "lucide-react";
 import AllowKeyDialog from "./allow-key-dialog";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { handleError } from "@/lib/utils";
 import { useBucketContext } from "../context";
-import KeyPermissionsEditor from "@/components/s3-permissions/key-permissions-editor";
 
 const PermissionsTab = () => {
   const { bucket, refetch } = useBucketContext();
-  const [selectedKey, setSelectedKey] = useState<{accessKeyId: string, name: string} | null>(null);
-  const [showKeyEditor, setShowKeyEditor] = useState(false);
 
   const denyKey = useDenyKey(bucket.id, {
     onSuccess: () => {
@@ -40,13 +37,6 @@ const PermissionsTab = () => {
     }
   };
 
-  const onEditPermissions = (key: any) => {
-    setSelectedKey({
-      accessKeyId: key.accessKeyId,
-      name: key.name || key.accessKeyId?.substring(0, 8)
-    });
-    setShowKeyEditor(true);
-  };
 
   return (
     <div>
@@ -65,7 +55,6 @@ const PermissionsTab = () => {
               <span>Read</span>
               <span>Write</span>
               <span>Owner</span>
-              <span>S3 Permisos</span>
               <span />
             </Table.Head>
 
@@ -96,15 +85,6 @@ const PermissionsTab = () => {
                       className="cursor-default"
                     />
                   </span>
-                  <span>
-                    <Button
-                      icon={Shield}
-                      onClick={() => onEditPermissions(key)}
-                      className="btn-outline btn-xs"
-                    >
-                      Editar
-                    </Button>
-                  </span>
                   <Button
                     icon={Trash}
                     onClick={() => onRemove(key.accessKeyId)}
@@ -116,20 +96,6 @@ const PermissionsTab = () => {
         </div>
       </Card>
 
-      {/* S3 Permissions Editor Modal */}
-      {showKeyEditor && selectedKey && (
-        <KeyPermissionsEditor
-          bucketId={bucket.id}
-          accessKeyId={selectedKey.accessKeyId}
-          keyName={selectedKey.name}
-          isOpen={showKeyEditor}
-          onClose={() => {
-            setShowKeyEditor(false);
-            setSelectedKey(null);
-            refetch(); // Refresh bucket data after permission changes
-          }}
-        />
-      )}
 
     </div>
   );

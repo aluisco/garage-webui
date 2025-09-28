@@ -91,7 +91,7 @@ const Sidebar = () => {
               )}
             >
               <Settings size={18} />
-              <p>Administración</p>
+              <p>Administration</p>
             </Link>
           </Menu.Item>
         )}

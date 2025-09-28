@@ -71,34 +71,27 @@ func (db *Database) Load() error {
 }
 
 func (db *Database) Save() error {
-	fmt.Println("Save: Attempting to acquire lock")
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
-	fmt.Println("Save: Lock acquired, marshaling data")
 
 	dataPath := filepath.Join(GetEnv("DATA_DIR", "./data"), "database.json")
 
 	data, err := json.MarshalIndent(db, "", "  ")
 	if err != nil {
-		fmt.Printf("Save: Marshal failed: %v\n", err)
 		return err
 	}
-	fmt.Println("Save: Data marshaled, writing to file")
 
 	return os.WriteFile(dataPath, data, 0600)
 }
 
 // saveUnsafe saves without acquiring locks (for use when lock is already held)
 func (db *Database) saveUnsafe() error {
-	fmt.Println("saveUnsafe: Marshaling data without lock")
 	dataPath := filepath.Join(GetEnv("DATA_DIR", "./data"), "database.json")
 
 	data, err := json.MarshalIndent(db, "", "  ")
 	if err != nil {
-		fmt.Printf("saveUnsafe: Marshal failed: %v\n", err)
 		return err
 	}
-	fmt.Println("saveUnsafe: Data marshaled, writing to file")
 
 	return os.WriteFile(dataPath, data, 0600)
 }
@@ -186,7 +179,7 @@ func (db *Database) CreateUser(req *schema.CreateUserRequest) (*schema.User, err
 
 	db.Users[user.ID] = user
 
-	if err := db.Save(); err != nil {
+	if err := db.saveUnsafe(); err != nil {
 		return nil, err
 	}
 
@@ -252,7 +245,7 @@ func (db *Database) UpdateUser(id string, req *schema.UpdateUserRequest) (*schem
 
 	user.UpdatedAt = time.Now()
 
-	if err := db.Save(); err != nil {
+	if err := db.saveUnsafe(); err != nil {
 		return nil, err
 	}
 
@@ -268,7 +261,7 @@ func (db *Database) DeleteUser(id string) error {
 	}
 
 	delete(db.Users, id)
-	return db.Save()
+	return db.saveUnsafe()
 }
 
 func (db *Database) ListUsers() ([]*schema.User, error) {
@@ -309,7 +302,7 @@ func (db *Database) CreateTenant(req *schema.CreateTenantRequest) (*schema.Tenan
 
 	db.Tenants[tenant.ID] = tenant
 
-	if err := db.Save(); err != nil {
+	if err := db.saveUnsafe(); err != nil {
 		return nil, err
 	}
 
@@ -358,7 +351,7 @@ func (db *Database) UpdateTenant(id string, req *schema.UpdateTenantRequest) (*s
 
 	tenant.UpdatedAt = time.Now()
 
-	if err := db.Save(); err != nil {
+	if err := db.saveUnsafe(); err != nil {
 		return nil, err
 	}
 
@@ -374,7 +367,7 @@ func (db *Database) DeleteTenant(id string) error {
 	}
 
 	delete(db.Tenants, id)
-	return db.Save()
+	return db.saveUnsafe()
 }
 
 func (db *Database) ListTenants() ([]*schema.Tenant, error) {
@@ -391,17 +384,13 @@ func (db *Database) ListTenants() ([]*schema.Tenant, error) {
 
 // Session operations
 func (db *Database) CreateSession(userID string) (*schema.Session, error) {
-	fmt.Println("CreateSession: Starting session creation")
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
-	fmt.Println("CreateSession: Generating token")
 	token, err := GenerateToken()
 	if err != nil {
-		fmt.Printf("CreateSession: Token generation failed: %v\n", err)
 		return nil, err
 	}
-	fmt.Println("CreateSession: Token generated successfully")
 
 	session := &schema.Session{
 		ID:        GenerateID(),
@@ -412,14 +401,10 @@ func (db *Database) CreateSession(userID string) (*schema.Session, error) {
 	}
 
 	db.Sessions[session.ID] = session
-	fmt.Println("CreateSession: Session stored in memory")
 
-	fmt.Println("CreateSession: Saving to database")
 	if err := db.saveUnsafe(); err != nil {
-		fmt.Printf("CreateSession: Database save failed: %v\n", err)
 		return nil, err
 	}
-	fmt.Println("CreateSession: Database saved successfully")
 
 	return session, nil
 }

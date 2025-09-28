@@ -22,8 +22,8 @@ RUN npm install -g concurrently
 WORKDIR /app
 
 # Install frontend dependencies
-COPY package.json pnpm-lock.yaml ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+COPY package.json ./
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --no-frozen-lockfile
 
 # Install backend dependencies
 COPY backend/go.mod backend/go.sum ./backend/

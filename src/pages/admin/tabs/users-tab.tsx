@@ -49,13 +49,13 @@ export default function UsersTab() {
   const getRoleDisplayName = (role: string) => {
     switch (role) {
       case "admin":
-        return "Administrador";
+        return "Administrator";
       case "tenant_admin":
-        return "Admin Tenant";
+        return "Tenant Admin";
       case "user":
-        return "Usuario";
+        return "User";
       case "readonly":
-        return "Solo Lectura";
+        return "Read Only";
       default:
         return role;
     }
@@ -72,9 +72,9 @@ export default function UsersTab() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-semibold">Gestión de Usuarios</h2>
+          <h2 className="text-xl font-semibold">User Management</h2>
           <p className="text-sm text-base-content/60">
-            Administra usuarios del sistema y sus permisos
+            Manage system users and their permissions
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export default function UsersTab() {
             startIcon={<Plus size={18} />}
             onClick={() => setShowCreateDialog(true)}
           >
-            Nuevo Usuario
+            New User
           </Button>
         )}
       </div>
@@ -94,12 +94,12 @@ export default function UsersTab() {
         <Card.Body className="p-0">
           <Table className="table-zebra">
             <Table.Head>
-              <span>Usuario</span>
+              <span>User</span>
               <span>Email</span>
               <span>Rol</span>
-              <span>Estado</span>
-              <span>Último Login</span>
-              <span>Acciones</span>
+              <span>Status</span>
+              <span>Last Login</span>
+              <span>Actions</span>
             </Table.Head>
 
             <Table.Body>
@@ -134,12 +134,12 @@ export default function UsersTab() {
                       {user.enabled ? (
                         <>
                           <UserCheck size={14} className="mr-1" />
-                          Activo
+                          Active
                         </>
                       ) : (
                         <>
                           <UserX size={14} className="mr-1" />
-                          Inactivo
+                          Inactive
                         </>
                       )}
                     </Badge>
@@ -151,7 +151,7 @@ export default function UsersTab() {
                         {dayjs(user.last_login).format("DD/MM/YYYY HH:mm")}
                       </span>
                     ) : (
-                      <span className="text-sm text-base-content/50">Nunca</span>
+                      <span className="text-sm text-base-content/50">Never</span>
                     )}
                   </td>
 
@@ -202,7 +202,7 @@ export default function UsersTab() {
 
           {users?.length === 0 && (
             <div className="text-center py-8 text-base-content/60">
-              No hay usuarios registrados
+              No users registered
             </div>
           )}
         </Card.Body>
@@ -226,29 +226,29 @@ export default function UsersTab() {
       {/* Delete Confirmation */}
       <Modal open={showDeleteConfirm} onClickBackdrop={() => setShowDeleteConfirm(false)}>
         <Modal.Header className="font-bold">
-          Confirmar Eliminación
+          Confirm Deletion
         </Modal.Header>
 
         <Modal.Body>
           <p>
-            ¿Estás seguro de que deseas eliminar el usuario{" "}
+            Are you sure you want to delete the user{" "}
             <strong>{selectedUser?.username}</strong>?
           </p>
           <p className="text-sm text-base-content/60 mt-2">
-            Esta acción no se puede deshacer.
+            This action cannot be undone.
           </p>
         </Modal.Body>
 
         <Modal.Actions>
           <Button onClick={() => setShowDeleteConfirm(false)}>
-            Cancelar
+            Cancel
           </Button>
           <Button
             color="error"
             loading={deleteUser.isPending}
             onClick={handleDelete}
           >
-            Eliminar
+            Delete
           </Button>
         </Modal.Actions>
       </Modal>

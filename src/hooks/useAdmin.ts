@@ -9,7 +9,7 @@ import {
   UpdateTenantRequest,
   TenantStats
 } from "@/types/admin";
-import { toast } from "sonner";
+import { showSuccess, showError } from "@/lib/sweetalert";
 
 // User hooks
 export const useUsers = () => {
@@ -46,10 +46,10 @@ export const useCreateUser = () => {
     mutationFn: (data: CreateUserRequest) => api.post<User>("/users", { body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Usuario creado exitosamente");
+      showSuccess("User created successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al crear usuario");
+      showError(error.message || "Error creating user");
     },
   });
 };
@@ -62,10 +62,10 @@ export const useUpdateUser = () => {
       api.put<User>(`/users/${id}`, { body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Usuario actualizado exitosamente");
+      showSuccess("User updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al actualizar usuario");
+      showError(error.message || "Error updating user");
     },
   });
 };
@@ -77,10 +77,10 @@ export const useDeleteUser = () => {
     mutationFn: (id: string) => api.delete(`/users/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.success("Usuario eliminado exitosamente");
+      showSuccess("User deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al eliminar usuario");
+      showError(error.message || "Error deleting user");
     },
   });
 };
@@ -131,10 +131,10 @@ export const useCreateTenant = () => {
     mutationFn: (data: CreateTenantRequest) => api.post<Tenant>("/tenants", { body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
-      toast.success("Tenant creado exitosamente");
+      showSuccess("Tenant created successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al crear tenant");
+      showError(error.message || "Error creating tenant");
     },
   });
 };
@@ -147,10 +147,10 @@ export const useUpdateTenant = () => {
       api.put<Tenant>(`/tenants/${id}`, { body: data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
-      toast.success("Tenant actualizado exitosamente");
+      showSuccess("Tenant updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al actualizar tenant");
+      showError(error.message || "Error updating tenant");
     },
   });
 };
@@ -162,10 +162,10 @@ export const useDeleteTenant = () => {
     mutationFn: (id: string) => api.delete(`/tenants/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenants"] });
-      toast.success("Tenant eliminado exitosamente");
+      showSuccess("Tenant deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al eliminar tenant");
+      showError(error.message || "Error deleting tenant");
     },
   });
 };

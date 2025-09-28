@@ -5,7 +5,6 @@ import { Users, Building2, ShieldCheck, Database } from "lucide-react";
 import TabView from "@/components/containers/tab-view";
 import UsersTab from "./tabs/users-tab";
 import TenantsTab from "./tabs/tenants-tab";
-import SystemTab from "./tabs/system-tab";
 
 export default function AdminDashboard() {
   const { hasPermission, isAdmin } = usePermissions();
@@ -15,7 +14,7 @@ export default function AdminDashboard() {
   const tabs = [
     ...(hasPermission("read_users") ? [{
       name: "users",
-      title: "Usuarios",
+      title: "Users",
       icon: Users,
       Component: UsersTab
     }] : []),
@@ -25,21 +24,15 @@ export default function AdminDashboard() {
       icon: Building2,
       Component: TenantsTab
     }] : []),
-    ...(isAdmin ? [{
-      name: "system",
-      title: "Sistema",
-      icon: ShieldCheck,
-      Component: SystemTab
-    }] : []),
   ];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Panel de Administración</h1>
+          <h1 className="text-3xl font-bold">Administration Panel</h1>
           <p className="text-base-content/60 mt-2">
-            Gestiona usuarios, tenants y configuraciones del sistema
+            Manage users, tenants and system configurations
           </p>
         </div>
       </div>
@@ -53,7 +46,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold">
                   {users?.length || 0}
                 </div>
-                <div className="text-sm text-base-content/60">Usuarios Totales</div>
+                <div className="text-sm text-base-content/60">Total Users</div>
               </div>
               <Users className="h-8 w-8 text-primary" />
             </Card.Body>
@@ -67,7 +60,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold">
                   {users?.filter(u => u.enabled).length || 0}
                 </div>
-                <div className="text-sm text-base-content/60">Usuarios Activos</div>
+                <div className="text-sm text-base-content/60">Active Users</div>
               </div>
               <ShieldCheck className="h-8 w-8 text-success" />
             </Card.Body>
@@ -81,7 +74,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold">
                   {tenants?.length || 0}
                 </div>
-                <div className="text-sm text-base-content/60">Tenants Totales</div>
+                <div className="text-sm text-base-content/60">Total Tenants</div>
               </div>
               <Building2 className="h-8 w-8 text-info" />
             </Card.Body>
@@ -95,7 +88,7 @@ export default function AdminDashboard() {
                 <div className="text-2xl font-bold">
                   {tenants?.filter(t => t.enabled).length || 0}
                 </div>
-                <div className="text-sm text-base-content/60">Tenants Activos</div>
+                <div className="text-sm text-base-content/60">Active Tenants</div>
               </div>
               <Database className="h-8 w-8 text-warning" />
             </Card.Body>

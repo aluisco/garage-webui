@@ -44,10 +44,10 @@ export const useAssignBucket = () => {
           queryKey: ["tenant-buckets", variables.assigned_tenant_id],
         });
       }
-      toast.success("Bucket asignado exitosamente");
+      toast.success("Bucket assigned successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al asignar bucket");
+      toast.error(error.message || "Error assigning bucket");
     },
   });
 };
@@ -71,10 +71,10 @@ export const useUnassignBucket = () => {
       queryClient.invalidateQueries({
         queryKey: ["tenant-buckets"],
       });
-      toast.success("Asignación de bucket removida exitosamente");
+      toast.success("Bucket assignment removed successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Error al remover asignación de bucket");
+      toast.error(error.message || "Error removing bucket assignment");
     },
   });
 };

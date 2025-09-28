@@ -10,9 +10,9 @@ import { User } from "@/types/admin";
 import { Toggle } from "@/components/ui/toggle";
 
 const updateUserSchema = z.object({
-  username: z.string().min(3, "El nombre de usuario debe tener al menos 3 caracteres").optional(),
-  email: z.string().email("Email inválido").optional(),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres").optional(),
+  username: z.string().min(3, "Username must be at least 3 characters").optional(),
+  email: z.string().email("Invalid email").optional(),
+  password: z.string().min(6, "Password must be at least 6 characters").optional(),
   role: z.enum(["admin", "tenant_admin", "user", "readonly"] as const).optional(),
   tenant_id: z.string().optional(),
   enabled: z.boolean().optional(),
@@ -84,10 +84,10 @@ export default function EditUserDialog({ open, user, onClose }: EditUserDialogPr
   };
 
   const roleOptions = [
-    ...(isAdmin ? [{ value: "admin", label: "Administrador" }] : []),
-    { value: "tenant_admin", label: "Administrador de Tenant" },
-    { value: "user", label: "Usuario" },
-    { value: "readonly", label: "Solo Lectura" },
+    ...(isAdmin ? [{ value: "admin", label: "Administrator" }] : []),
+    { value: "tenant_admin", label: "Tenant Administrator" },
+    { value: "user", label: "User" },
+    { value: "readonly", label: "Read Only" },
   ];
 
   if (!user) return null;
@@ -95,7 +95,7 @@ export default function EditUserDialog({ open, user, onClose }: EditUserDialogPr
   return (
     <Modal open={open} onClickBackdrop={onClose}>
       <Modal.Header className="font-bold">
-        Editar Usuario: {user.username}
+        Edit User: {user.username}
       </Modal.Header>
 
       <Modal.Body>
@@ -103,8 +103,8 @@ export default function EditUserDialog({ open, user, onClose }: EditUserDialogPr
           <InputField
             form={form}
             name="username"
-            title="Nombre de Usuario"
-            placeholder="Ingresa el nombre de usuario"
+            title="Username"
+            placeholder="Enter username"
           />
 
           <InputField
@@ -112,20 +112,20 @@ export default function EditUserDialog({ open, user, onClose }: EditUserDialogPr
             name="email"
             title="Email"
             type="email"
-            placeholder="Ingresa el email"
+            placeholder="Enter email"
           />
 
           <InputField
             form={form}
             name="password"
-            title="Nueva Contraseña"
+            title="New Password"
             type="password"
-            placeholder="Dejar vacío para mantener la actual"
+            placeholder="Leave blank to keep current"
           />
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Rol</span>
+              <span className="label-text">Role</span>
             </label>
             <Select
               {...form.register("role")}
@@ -149,7 +149,7 @@ export default function EditUserDialog({ open, user, onClose }: EditUserDialogPr
                 {...form.register("tenant_id")}
                 className="select-bordered"
               >
-                <Select.Option value="">Sin tenant</Select.Option>
+                <Select.Option value="">No tenant</Select.Option>
                 {tenants?.map((tenant) => (
                   <Select.Option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -165,7 +165,7 @@ export default function EditUserDialog({ open, user, onClose }: EditUserDialogPr
                 {...form.register("enabled")}
                 color="success"
               />
-              <span className="label-text">Usuario habilitado</span>
+              <span className="label-text">User enabled</span>
             </label>
           </div>
         </form>
@@ -173,14 +173,14 @@ export default function EditUserDialog({ open, user, onClose }: EditUserDialogPr
 
       <Modal.Actions>
         <Button onClick={onClose} disabled={updateUser.isPending}>
-          Cancelar
+          Cancel
         </Button>
         <Button
           color="primary"
           loading={updateUser.isPending}
           onClick={form.handleSubmit(handleSubmit)}
         >
-          Actualizar Usuario
+          Update User
         </Button>
       </Modal.Actions>
     </Modal>

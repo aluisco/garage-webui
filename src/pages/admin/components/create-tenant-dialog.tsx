@@ -5,14 +5,15 @@ import { Modal, Button } from "react-daisyui";
 import { InputField } from "@/components/ui/input";
 import { useCreateTenant } from "@/hooks/useAdmin";
 import { Toggle } from "@/components/ui/toggle";
+import { confirmAction } from "@/lib/sweetalert";
 
 const createTenantSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string(),
   enabled: z.boolean(),
-  max_buckets: z.number().min(0, "Debe ser un número positivo"),
-  max_keys: z.number().min(0, "Debe ser un número positivo"),
-  quota_bytes: z.number().min(0, "Debe ser un número positivo").optional(),
+  max_buckets: z.number().min(0, "Must be a positive number"),
+  max_keys: z.number().min(0, "Must be a positive number"),
+  quota_bytes: z.number().min(0, "Must be a positive number").optional(),
 });
 
 type CreateTenantForm = z.infer<typeof createTenantSchema>;
@@ -38,15 +39,26 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
   });
 
   const handleSubmit = async (data: CreateTenantForm) => {
-    try {
-      await createTenant.mutateAsync({
-        ...data,
-        quota_bytes: data.quota_bytes || undefined,
-      });
-      onClose();
-      form.reset();
-    } catch (error) {
-      // Error is handled by the mutation
+    // Mostrar confirmación antes de crear
+    const result = await confirmAction(
+      'Create Tenant',
+      `Are you sure you want to create the tenant "${data.name}"?`,
+      'Yes, create tenant',
+      'Cancel',
+      'question'
+    );
+
+    if (result.isConfirmed) {
+      try {
+        await createTenant.mutateAsync({
+          ...data,
+          quota_bytes: data.quota_bytes || undefined,
+        });
+        onClose();
+        form.reset();
+      } catch (error) {
+        // Error is handled by the mutation
+      }
     }
   };
 
@@ -61,7 +73,7 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
   return (
     <Modal open={open} onClickBackdrop={onClose}>
       <Modal.Header className="font-bold">
-        Crear Nuevo Tenant
+        Create New Tenant
       </Modal.Header>
 
       <Modal.Body>
@@ -69,19 +81,19 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
           <InputField
             form={form}
             name="name"
-            title="Nombre del Tenant"
-            placeholder="Ej: Empresa ABC"
+            title="Tenant Name"
+            placeholder="e.g. Company ABC"
             required
           />
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Descripción</span>
+              <span className="label-text">Description</span>
             </label>
             <textarea
               {...form.register("description")}
               className="textarea textarea-bordered"
-              placeholder="Descripción opcional del tenant"
+              placeholder="Optional tenant description"
               rows={3}
             />
           </div>
@@ -90,7 +102,7 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
             <InputField
               form={form}
               name="max_buckets"
-              title="Máximo de Buckets"
+              title="Maximum Buckets"
               type="number"
               min={0}
               placeholder="10"
@@ -100,7 +112,7 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
             <InputField
               form={form}
               name="max_keys"
-              title="Máximo de Keys"
+              title="Maximum Keys"
               type="number"
               min={0}
               placeholder="100"
@@ -110,15 +122,15 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Cuota de Almacenamiento (GB)</span>
-              <span className="label-text-alt">Opcional</span>
+              <span className="label-text">Storage Quota (GB)</span>
+              <span className="label-text-alt">Optional</span>
             </label>
             <input
               type="number"
               step="0.1"
               min={0}
               className="input input-bordered"
-              placeholder="Ej: 100 (para 100GB)"
+              placeholder="e.g. 100 (for 100GB)"
               onChange={(e) => {
                 const bytes = formatBytesInput(e.target.value);
                 form.setValue("quota_bytes", bytes > 0 ? bytes : undefined);
@@ -126,7 +138,7 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
             />
             <label className="label">
               <span className="label-text-alt">
-                Dejar vacío para sin límite
+                Leave empty for no limit
               </span>
             </label>
           </div>
@@ -137,7 +149,7 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
                 {...form.register("enabled")}
                 color="success"
               />
-              <span className="label-text">Tenant habilitado</span>
+              <span className="label-text">Tenant enabled</span>
             </label>
           </div>
         </form>
@@ -145,14 +157,14 @@ export default function CreateTenantDialog({ open, onClose }: CreateTenantDialog
 
       <Modal.Actions>
         <Button onClick={onClose} disabled={createTenant.isPending}>
-          Cancelar
+          Cancel
         </Button>
         <Button
           color="primary"
           loading={createTenant.isPending}
           onClick={form.handleSubmit(handleSubmit)}
         >
-          Crear Tenant
+          Create Tenant
         </Button>
       </Modal.Actions>
     </Modal>

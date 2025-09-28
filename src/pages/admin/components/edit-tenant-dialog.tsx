@@ -7,14 +7,15 @@ import { InputField } from "@/components/ui/input";
 import { useUpdateTenant } from "@/hooks/useAdmin";
 import { Tenant } from "@/types/admin";
 import { Toggle } from "@/components/ui/toggle";
+import { confirmAction } from "@/lib/sweetalert";
 
 const updateTenantSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").optional(),
+  name: z.string().min(2, "Name must be at least 2 characters").optional(),
   description: z.string().optional(),
   enabled: z.boolean().optional(),
-  max_buckets: z.number().min(0, "Debe ser un número positivo").optional(),
-  max_keys: z.number().min(0, "Debe ser un número positivo").optional(),
-  quota_bytes: z.number().min(0, "Debe ser un número positivo").optional(),
+  max_buckets: z.number().min(0, "Must be a positive number").optional(),
+  max_keys: z.number().min(0, "Must be a positive number").optional(),
+  quota_bytes: z.number().min(0, "Must be a positive number").optional(),
 });
 
 type UpdateTenantForm = z.infer<typeof updateTenantSchema>;
@@ -65,14 +66,25 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
   const handleSubmit = async (data: UpdateTenantForm) => {
     if (!tenant) return;
 
-    try {
-      await updateTenant.mutateAsync({
-        id: tenant.id,
-        data,
-      });
-      onClose();
-    } catch (error) {
-      // Error is handled by the mutation
+    // Mostrar confirmación antes de actualizar
+    const result = await confirmAction(
+      'Update Tenant',
+      `Are you sure you want to update the tenant "${tenant.name}"?`,
+      'Yes, update tenant',
+      'Cancel',
+      'question'
+    );
+
+    if (result.isConfirmed) {
+      try {
+        await updateTenant.mutateAsync({
+          id: tenant.id,
+          data,
+        });
+        onClose();
+      } catch (error) {
+        // Error is handled by the mutation
+      }
     }
   };
 
@@ -95,7 +107,7 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
   return (
     <Modal open={open} onClickBackdrop={onClose}>
       <Modal.Header className="font-bold">
-        Editar Tenant: {tenant.name}
+        Edit Tenant: {tenant.name}
       </Modal.Header>
 
       <Modal.Body>
@@ -103,18 +115,18 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
           <InputField
             form={form}
             name="name"
-            title="Nombre del Tenant"
-            placeholder="Ej: Empresa ABC"
+            title="Tenant Name"
+            placeholder="e.g. Company ABC"
           />
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Descripción</span>
+              <span className="label-text">Description</span>
             </label>
             <textarea
               {...form.register("description")}
               className="textarea textarea-bordered"
-              placeholder="Descripción opcional del tenant"
+              placeholder="Optional tenant description"
               rows={3}
             />
           </div>
@@ -123,7 +135,7 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
             <InputField
               form={form}
               name="max_buckets"
-              title="Máximo de Buckets"
+              title="Maximum Buckets"
               type="number"
               min={0}
             />
@@ -131,7 +143,7 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
             <InputField
               form={form}
               name="max_keys"
-              title="Máximo de Keys"
+              title="Maximum Keys"
               type="number"
               min={0}
             />
@@ -139,21 +151,21 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
 
           <div className="form-control w-full">
             <label className="label">
-              <span className="label-text">Cuota de Almacenamiento (GB)</span>
-              <span className="label-text-alt">Opcional</span>
+              <span className="label-text">Storage Quota (GB)</span>
+              <span className="label-text-alt">Optional</span>
             </label>
             <input
               type="number"
               step="0.1"
               min={0}
               className="input input-bordered"
-              placeholder="Ej: 100 (para 100GB)"
+              placeholder="e.g. 100 (for 100GB)"
               value={quotaGB}
               onChange={(e) => handleQuotaChange(e.target.value)}
             />
             <label className="label">
               <span className="label-text-alt">
-                Dejar vacío para sin límite
+                Leave empty for no limit
               </span>
             </label>
           </div>
@@ -164,7 +176,7 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
                 {...form.register("enabled")}
                 color="success"
               />
-              <span className="label-text">Tenant habilitado</span>
+              <span className="label-text">Tenant enabled</span>
             </label>
           </div>
         </form>
@@ -172,14 +184,14 @@ export default function EditTenantDialog({ open, tenant, onClose }: EditTenantDi
 
       <Modal.Actions>
         <Button onClick={onClose} disabled={updateTenant.isPending}>
-          Cancelar
+          Cancel
         </Button>
         <Button
           color="primary"
           loading={updateTenant.isPending}
           onClick={form.handleSubmit(handleSubmit)}
         >
-          Actualizar Tenant
+          Update Tenant
         </Button>
       </Modal.Actions>
     </Modal>
